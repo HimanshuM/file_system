@@ -36,9 +36,15 @@ use ArrayUtils\Arrays;
 
 		}
 
-		function children($subPath = false) {
+		function children($subPath = false, $hidden = false) {
 
-			$children = new Arrays(glob($this->_cwd.(!empty($subPath) ? "/".trim($subPath, "/") : "")."/*"));
+			$children;
+			if ($hidden) {
+				$children = new Arrays(glob($this->_cwd.(!empty($subPath) ? "/".trim($subPath, "/") : "")."/{,.}[!.,!..]*", GLOB_MARK | GLOB_BRACE));
+			}
+			else {
+				$children = new Arrays(glob($this->_cwd.(!empty($subPath) ? "/".trim($subPath, "/") : "")."/*"));
+			}
 
 			return $children->map(function($e) {
 				return static::path($e);
