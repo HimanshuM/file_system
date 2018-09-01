@@ -38,22 +38,36 @@ use ArrayUtils\Arrays;
 
 		function children($subPath = false, $hidden = false) {
 
-			$children;
+			$pattern = "*";
+			$flags = 0;
 			if ($hidden) {
-				$children = new Arrays(glob($this->_cwd.(!empty($subPath) ? "/".trim($subPath, "/") : "")."/{,.}[!.,!..]*", GLOB_MARK | GLOB_BRACE));
-			}
-			else {
-				$children = new Arrays(glob($this->_cwd.(!empty($subPath) ? "/".trim($subPath, "/") : "")."/*"));
+
+				$patter = "{,.}[!.,!..]*";
+				$flags = GLOB_MARK | GLOB_BRACE;
+
 			}
 
-			return $children->map(function($e) {
-				return static::path($e);
-			});
+			if (!empty($subPath)) {
+				$pattern = trim($subPath, "/")."/".$pattern;
+			}
+
+			return $this->find($pattern, $flags);
 
 		}
 
 		function chmod($mode) {
 			return chmod($this->_cwd, $mode);
+		}
+
+		function find($pattern = "*", $flags = 0) {
+
+			$pattern = "/".trim($pattern, "/");
+			$children = new Arrays(glob($this->_cwd.$pattern, $flags));
+
+			return $children->map(function($e) {
+				return static::path($e);
+			});
+
 		}
 
 		function has($path) {

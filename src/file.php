@@ -17,13 +17,11 @@ use AttributeHelper\Accessor;
 			$this->_path = $this->_cwd->cwd."/".$this->_basename;
 
 			$this->prependUnderscore();
-			$this->readonly("path", ["length", function() {
-				return filesize($this->_path);
-			}], ["parent", function() {
+			$this->readonly("path", ["length", "size"], ["parent", function() {
 				return clone $this->cwd;
 			}]);
 
-			$this->methodsAsProperties("extension", "lines", "name", "read");
+			$this->methodsAsProperties("extension", "lines", "name", "read", "size", "stat", "touch");
 
 		}
 
@@ -94,8 +92,24 @@ use AttributeHelper\Accessor;
 
 		}
 
+		function size() {
+			return filesize($this->_path);
+		}
+
+		function stat() {
+			return stat($this->_path);
+		}
+
 		function __toString() {
 			return $this->_path;
+		}
+
+		function touch() {
+
+			if (!@touch($this->_path)) {
+				return false;
+			}
+
 		}
 
 		function write($content, $append = "w") {
