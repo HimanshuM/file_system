@@ -113,6 +113,52 @@ use ArrayUtils\Arrays;
 
 		}
 
+		function scan($pattern = [], $newer = true) {
+
+			$key = "mtime";
+			if (isset($pattern["mtime"])) {
+				$key = "mtime";
+			}
+			else if (isset($pattern["ctime"])) {
+				$key = "ctime";
+			}
+			else if (isset($pattern["atime"])) {
+				$key = "atime";
+			}
+			else {
+				throw new Exception("Dir::scan() expects pattern in 'mtime', 'ctime' or 'atime'");
+			}
+
+			$value = $pattern[$key];
+
+			$children = $this->find();
+			return $children->filter(function($f) use ($key, $newer, $value) {
+
+				if ($f->isDir) {
+					return false;
+				}
+
+				if ($newer) {
+
+					if ($f->stat[$key] > $value) {
+						return true;
+					}
+
+				}
+				else {
+
+					if ($f->stat[$key] < $value) {
+						return true;
+					}
+
+				}
+
+				return false;
+
+			});
+
+		}
+
 		function __toString() {
 			return $this->_cwd;
 		}
