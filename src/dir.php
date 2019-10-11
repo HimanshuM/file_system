@@ -42,7 +42,7 @@ use ArrayUtils\Arrays;
 			$flags = 0;
 			if ($hidden) {
 
-				$patter = "{,.}[!.,!..]*";
+				$pattern = "{,.}[!.,!..]*";
 				$flags = GLOB_MARK | GLOB_BRACE;
 
 			}
