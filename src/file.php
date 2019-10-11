@@ -21,12 +21,16 @@ use AttributeHelper\Accessor;
 				return clone $this->cwd;
 			}]);
 
-			$this->methodsAsProperties("extension", "lines", "name", "read", "size", "stat", "touch");
+			$this->methodsAsProperties("csv", "extension", "lines", "name", "read", "readCsv", "size", "stat", "touch");
 
 		}
 
 		function chmod($mode) {
 			return chmod($this->_path, $mode);
+		}
+
+		function csv() {
+			return $this->readCsv();
 		}
 
 		function delete() {
@@ -75,6 +79,34 @@ use AttributeHelper\Accessor;
 			fclose($file);
 
 			return $content;
+
+		}
+
+		function readCsv($hasHeader = true, int $length = 0, string $delimiter = ",", string $enclosure = '"', string $escape = "\\") {
+
+			$header = [];
+			$data = [];
+
+			$file = fopen($this->_path, "r");
+			while (($line = fgetcsv($file, $length, $delimiter, $enclosure, $escape)) !== false) {
+
+				if ($hasHeader) {
+
+					if (empty($header)) {
+						$header = $line;
+					}
+					else {
+						$data[] = array_combine($header, $line);
+					}
+
+				}
+				else {
+					$data[] = $line;
+				}
+
+			}
+
+			return $data;
 
 		}
 
