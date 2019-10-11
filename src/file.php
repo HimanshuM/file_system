@@ -53,14 +53,20 @@ use AttributeHelper\Accessor;
 			return new File($filename);
 		}
 
-		function read($length = -1) {
+		function read($options = []) {
 
 			if (!realpath($this->_path)) {
 				throw new Exception("Could not find path '".$this->_path."'. No such file or directory.", 1);
 			}
 
-			$file = fopen($this->_path, "r");
+			$mode = "r";
+			if (!empty($options["binary"])) {
+				$mode = "rb";
+			}
 
+			$file = fopen($this->_path, $mode);
+
+			$length = $options["length"] ?? -1;
 			if ($length == -1) {
 				$length = filesize($this->_path);
 			}
